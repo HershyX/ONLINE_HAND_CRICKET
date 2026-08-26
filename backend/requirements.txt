@@ -1,0 +1,18 @@
+# Web framework
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+
+# WebSocket support (bundled via uvicorn[standard])
+websockets==14.2
+
+# Data validation — use latest pydantic with Python 3.14 wheels
+pydantic==2.13.4
+pydantic-settings==2.10.1
+
+# Database
+aiosqlite==0.20.0
+sqlalchemy==2.0.41
+
+# Utilities
+python-multipart==0.0.20
+python-dotenv==1.1.1

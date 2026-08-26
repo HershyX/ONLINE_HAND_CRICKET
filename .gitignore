@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Build output
+frontend/dist/
+backend/dist/
+backend/build/
+*.egg-info/
+
+# Environment files (secrets)
+.env
+.env.local
+.env.production
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# pytest
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug logs
+*.log
