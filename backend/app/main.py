@@ -64,6 +64,13 @@ async def health_check() -> dict:
     }
 
 
+# Alias under /api so the frontend's apiFetch('/health') works
+# regardless of whether VITE_API_BASE_URL includes the /api suffix.
+@app.get("/api/health")
+async def health_check_api() -> dict:
+    return await health_check()
+
+
 # ─── Routers ──────────────────────────────────────────────────────────────────
 
 app.include_router(rooms.router, prefix="/api")
