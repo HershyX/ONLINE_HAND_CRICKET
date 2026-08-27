@@ -12,7 +12,7 @@
  *   apiFetch('/health')        → https://your-app.onrender.com/api/health
  */
 
-import { API_BASE_URL } from '../utils/env'
+import { API_BASE_URL, API_CONFIGURATION_ERROR } from '../utils/env'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,6 +51,10 @@ async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  if (API_CONFIGURATION_ERROR) {
+    throw new Error(API_CONFIGURATION_ERROR)
+  }
+
   // Ensure exactly one slash between base and path
   const base = API_BASE_URL.replace(/\/$/, '')
   const url  = `${base}/${path.replace(/^\//, '')}`

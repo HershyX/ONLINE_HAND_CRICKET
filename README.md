@@ -162,6 +162,23 @@ ExecStart=/path/to/venv/bin/python run.py --production
 | `VITE_API_BASE_URL` | `/api` | REST API base URL |
 | `VITE_WS_BASE_URL` | _(auto-detected)_ | WebSocket URL (auto-detects ws/wss) |
 
+For a Vercel deployment, add these variables in the Vercel project settings
+before building or redeploying. Replace the placeholder with the public Render
+service URL:
+
+```text
+VITE_API_BASE_URL=https://your-render-service.onrender.com/api
+VITE_WS_BASE_URL=wss://your-render-service.onrender.com/ws
+```
+
+The committed `frontend/vercel.json` rewrite is only for client-side routes;
+it does not proxy `/api` requests to Render. Without `VITE_API_BASE_URL`, the
+browser calls Vercel at `/api/rooms`, which returns `404 Not Found`.
+
+After deployment, verify the backend directly at
+`https://your-render-service.onrender.com/health` and confirm that the browser
+request for room creation targets the Render hostname, not the Vercel hostname.
+
 ### 5. Configure HTTPS
 
 The frontend WebSocket client automatically uses `wss://` when the page is served over HTTPS. No code changes needed — just configure TLS on your reverse proxy.

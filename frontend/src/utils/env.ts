@@ -20,6 +20,9 @@ const isDev = import.meta.env.DEV  // true during `vite dev`, false after `vite 
 
 const rawApiUrl = import.meta.env.VITE_API_BASE_URL as string | undefined
 
+const hasInvalidProductionApiUrl =
+  !isDev && (!rawApiUrl || rawApiUrl.includes('YOUR-RENDER-APP'))
+
 export const API_BASE_URL: string = (() => {
   // In dev without the var set → use Vite's proxy path '/api'
   if (!rawApiUrl) {
@@ -35,6 +38,10 @@ export const API_BASE_URL: string = (() => {
   // Strip trailing slash for consistent path joining
   return rawApiUrl.replace(/\/$/, '')
 })()
+
+export const API_CONFIGURATION_ERROR = hasInvalidProductionApiUrl
+  ? 'The production API is not configured. Set VITE_API_BASE_URL in Vercel to your Render URL ending in /api, then redeploy.'
+  : null
 
 // ─── WebSocket base URL ────────────────────────────────────────────────────────
 
