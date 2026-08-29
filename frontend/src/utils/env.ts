@@ -9,6 +9,9 @@
  *   VITE_API_BASE_URL  = https://<your-render-app>.onrender.com/api
  *   VITE_WS_BASE_URL   = wss://<your-render-app>.onrender.com/ws
  *
+ * The /api and /ws suffixes are appended automatically if omitted, but set
+ * them explicitly to make the intended routing obvious.
+ *
  * Leave both unset for local dev — the Vite proxy handles routing automatically.
  */
 
@@ -36,7 +39,10 @@ export const API_BASE_URL: string = (() => {
     return '/api'
   }
   // Strip trailing slash for consistent path joining
-  return rawApiUrl.replace(/\/$/, '')
+  const base = rawApiUrl.replace(/\/$/, '')
+  // The backend always mounts REST routes under /api. Append the suffix if it
+  // was omitted from the env var, so every call can't 404 with "Not Found".
+  return base.endsWith('/api') ? base : `${base}/api`
 })()
 
 export const API_CONFIGURATION_ERROR = hasInvalidProductionApiUrl
@@ -47,20 +53,29 @@ export const API_CONFIGURATION_ERROR = hasInvalidProductionApiUrl
 
 const rawWsUrl = import.meta.env.VITE_WS_BASE_URL as string | undefined
 
+// Ensure an absolute URL points at the backend's /ws route (suffix optional).
+function toWsUrl(url: string): string {
+  const base = url.replace(/\/$/, '')
+  return base.endsWith('/ws') ? base : `${base}/ws`
+}
+
 export const WS_BASE_URL: string = (() => {
   if (rawWsUrl) {
-    return rawWsUrl.replace(/\/$/, '')
+    return toWsUrl(rawWsUrl)
+  }
+
+  if (rawApiUrl) {
+    // Production without explicit WS URL: derive from VITE_API_BASE_URL
+    // by converting https://host/api → wss://host/ws
+    return toWsUrl(
+      rawApiUrl
+        .replace(/^https:\/\//, 'wss://')
+        .replace(/^http:\/\//, 'ws://')
+        .replace(/\/api$/, '/ws'),
+    )
   }
 
   if (!isDev) {
-    // Production without explicit WS URL: derive from VITE_API_BASE_URL
-    // by converting https://host/api → wss://host/ws
-    if (rawApiUrl) {
-      return rawApiUrl
-        .replace(/^https:\/\//, 'wss://')
-        .replace(/^http:\/\//, 'ws://')
-        .replace(/\/api$/, '/ws')
-    }
     console.error(
       '[HandCricket] VITE_WS_BASE_URL is not set. ' +
       'Add it to Vercel → Settings → Environment Variables → ' +
